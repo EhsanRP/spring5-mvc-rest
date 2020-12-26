@@ -7,9 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Controller
@@ -20,7 +18,6 @@ public class CustomerController {
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
     }
-
 
     @GetMapping
     public ResponseEntity<CustomerListDTO> getAllCustomers() {
@@ -52,7 +49,13 @@ public class CustomerController {
         return new ResponseEntity<CustomerDTO>(customerService.getCustomerByLastName(key), HttpStatus.OK);
     }
 
-    private String searchKeyHelper(String input){
+    @PostMapping
+    public ResponseEntity<CustomerDTO> createNewCustomer(@RequestBody CustomerDTO customerDTO){
+        return new ResponseEntity<CustomerDTO>(customerService.createNewCustomer(customerDTO),HttpStatus.CREATED);
+    }
+
+    //HELPER METHODS
+    private String searchKeyHelper(String input) {
         var argument = input.split("_");
 
         if (argument.length == 0) {
@@ -64,7 +67,10 @@ public class CustomerController {
             stringBuffer.append(" ");
         }
 
-        var key = stringBuffer.toString();
+        if (stringBuffer.length() == 0)
+            return null;
+
+        var key = stringBuffer.deleteCharAt(stringBuffer.length() - 1).toString();
 
         return key;
     }

@@ -40,7 +40,7 @@ public class Bootstrap implements CommandLineRunner {
         customerRepository.save(new Customer("Negar","Omrani Khoo"));
         customerRepository.save(new Customer("Ehsan","Rostami Pour"));
         customerRepository.save(new Customer("Uncle","J.T"));
-        customerRepository.save(new Customer("Arian"," Dashti"));
+        customerRepository.save(new Customer("Arian","Dashti"));
         customerRepository.save(new Customer("Tomas","Roddson"));
     }
 
