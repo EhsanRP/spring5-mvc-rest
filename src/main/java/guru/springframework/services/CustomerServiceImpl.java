@@ -27,7 +27,7 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.findById(id)
                 .map(customer -> {
                     var customerDTO = customerMapper.customerToCustomerDTO(customer);
-                    customerDTO.setCustomerURL("/api/customers/id/"+customerDTO.getId());
+                    customerDTO.setCustomerURL("/api/customers/id/" + customerDTO.getId());
 
                     return customerDTO;
                 })
@@ -39,7 +39,7 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.findAll().stream()
                 .map(customer -> {
                     var customerDTO = customerMapper.customerToCustomerDTO(customer);
-                    customerDTO.setCustomerURL("/api/customers/id/"+customerDTO.getId());
+                    customerDTO.setCustomerURL("/api/customers/id/" + customerDTO.getId());
                     return customerDTO;
                 })
                 .collect(Collectors.toList());
@@ -52,7 +52,7 @@ public class CustomerServiceImpl implements CustomerService {
         errorHelperMethod(customer, name);
 
         var returnValue = customerMapper.customerToCustomerDTO(customer);
-        returnValue.setCustomerURL("/api/customers/id/"+ returnValue.getId());
+        returnValue.setCustomerURL("/api/customers/id/" + returnValue.getId());
         return returnValue;
     }
 
@@ -63,17 +63,54 @@ public class CustomerServiceImpl implements CustomerService {
         errorHelperMethod(customer, lastName);
 
         var returnValue = customerMapper.customerToCustomerDTO(customer);
-        returnValue.setCustomerURL("/api/customers/id/"+ returnValue.getId());
+        returnValue.setCustomerURL("/api/customers/id/" + returnValue.getId());
         return returnValue;
     }
 
     @Override
     public CustomerDTO createNewCustomer(CustomerDTO customerDTO) {
-        var customer = customerMapper.CustomerDTOtoCustomer(customerDTO);
+        return saveAndReturnDTO(customerMapper.CustomerDTOtoCustomer(customerDTO));
+    }
+
+    private CustomerDTO saveAndReturnDTO(Customer customer) {
+
         var savedCustomer = customerRepository.save(customer);
+
         var returnDTO = customerMapper.customerToCustomerDTO(savedCustomer);
-        returnDTO.setCustomerURL("/api/customers/id/"+ returnDTO.getId());
+        returnDTO.setCustomerURL("/api/customers/id/" + savedCustomer.getId());
         return returnDTO;
+    }
+
+    @Override
+    public CustomerDTO saveCustomerByDTO(Long id, CustomerDTO customerDTO) {
+        var customer = customerMapper.CustomerDTOtoCustomer(customerDTO);
+        customer.setId(id);
+
+        return saveAndReturnDTO(customer);
+    }
+
+    @Override
+    public CustomerDTO patchCustomer(Long id, CustomerDTO customerDTO) {
+        return customerRepository.findById(id).map(customer -> {
+
+            if (customerDTO.getFirstName() != null)
+                customer.setFirstName(customerDTO.getFirstName());
+
+            if (customerDTO.getLastName() != null)
+                customer.setLastName(customerDTO.getLastName());
+
+            var returnDTO = customerMapper.customerToCustomerDTO(customerRepository.save(customer));
+            returnDTO.setCustomerURL("/api/customers/id/" + id);
+
+            return returnDTO;
+        }).orElseThrow(RuntimeException::new);
+
+        //TODO BETTER IMPLEMENT FOR EXCEPTION HANDLING
+    }
+
+    @Override
+    public void deleteCustomerById(Long id) {
+        customerRepository.deleteById(id);
     }
 
     private void errorHelperMethod(Customer ArgumentObject, String ArgumentField) {
