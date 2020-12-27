@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Controller
-@RequestMapping("api/v1/customers")
+@RequestMapping(CustomerController.BASE_URL)
 public class CustomerController {
+
     private final CustomerService customerService;
+    public static final String BASE_URL = "api/v1/customers";
 
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;

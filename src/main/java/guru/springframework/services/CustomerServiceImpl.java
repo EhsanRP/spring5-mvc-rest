@@ -2,6 +2,7 @@ package guru.springframework.services;
 
 import guru.springframework.api.v1.mapper.CustomerMapper;
 import guru.springframework.api.v1.model.CustomerDTO;
+import guru.springframework.controllers.v1.CustomerController;
 import guru.springframework.domain.Customer;
 import guru.springframework.repositories.CustomerRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +28,11 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.findById(id)
                 .map(customer -> {
                     var customerDTO = customerMapper.customerToCustomerDTO(customer);
-                    customerDTO.setCustomerURL("/api/customers/id/" + customerDTO.getId());
+                    customerDTO.setCustomerURL(getCustomerUrl(customerDTO.getId()));
 
                     return customerDTO;
                 })
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.findAll().stream()
                 .map(customer -> {
                     var customerDTO = customerMapper.customerToCustomerDTO(customer);
-                    customerDTO.setCustomerURL("/api/customers/id/" + customerDTO.getId());
+                    customerDTO.setCustomerURL(getCustomerUrl(customerDTO.getId()));
                     return customerDTO;
                 })
                 .collect(Collectors.toList());
@@ -52,7 +53,7 @@ public class CustomerServiceImpl implements CustomerService {
         errorHelperMethod(customer, name);
 
         var returnValue = customerMapper.customerToCustomerDTO(customer);
-        returnValue.setCustomerURL("/api/customers/id/" + returnValue.getId());
+        returnValue.setCustomerURL(getCustomerUrl(returnValue.getId()));
         return returnValue;
     }
 
@@ -63,7 +64,7 @@ public class CustomerServiceImpl implements CustomerService {
         errorHelperMethod(customer, lastName);
 
         var returnValue = customerMapper.customerToCustomerDTO(customer);
-        returnValue.setCustomerURL("/api/customers/id/" + returnValue.getId());
+        returnValue.setCustomerURL(getCustomerUrl(returnValue.getId()));
         return returnValue;
     }
 
@@ -77,7 +78,7 @@ public class CustomerServiceImpl implements CustomerService {
         var savedCustomer = customerRepository.save(customer);
 
         var returnDTO = customerMapper.customerToCustomerDTO(savedCustomer);
-        returnDTO.setCustomerURL("/api/customers/id/" + savedCustomer.getId());
+        returnDTO.setCustomerURL(getCustomerUrl(savedCustomer.getId()));
         return returnDTO;
     }
 
@@ -100,7 +101,7 @@ public class CustomerServiceImpl implements CustomerService {
                 customer.setLastName(customerDTO.getLastName());
 
             var returnDTO = customerMapper.customerToCustomerDTO(customerRepository.save(customer));
-            returnDTO.setCustomerURL("/api/customers/id/" + id);
+            returnDTO.setCustomerURL(getCustomerUrl(id));
 
             return returnDTO;
         }).orElseThrow(RuntimeException::new);
@@ -113,10 +114,16 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.deleteById(id);
     }
 
+
+    //HELPER METHODS HERE
     private void errorHelperMethod(Customer ArgumentObject, String ArgumentField) {
         if (ArgumentObject == null) {
             log.error("Customer For " + ArgumentField + " Not Found");
-            throw new RuntimeException();
+            throw new ResourceNotFoundException();
         }
+    }
+
+    private String getCustomerUrl(Long id){
+        return CustomerController.BASE_URL + "/" + id;
     }
 }
