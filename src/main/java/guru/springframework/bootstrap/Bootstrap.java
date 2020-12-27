@@ -2,8 +2,10 @@ package guru.springframework.bootstrap;
 
 import guru.springframework.domain.Category;
 import guru.springframework.domain.Customer;
+import guru.springframework.domain.Vendor;
 import guru.springframework.repositories.CategoryRepository;
 import guru.springframework.repositories.CustomerRepository;
+import guru.springframework.repositories.VendorRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -14,11 +16,13 @@ public class Bootstrap implements CommandLineRunner {
 
     private final CategoryRepository categoryRepository;
     private final CustomerRepository customerRepository;
+    private final VendorRepository vendorRepository;
 
 
-    public Bootstrap(CategoryRepository categoryRepository, CustomerRepository customerRepository) {
+    public Bootstrap(CategoryRepository categoryRepository, CustomerRepository customerRepository, VendorRepository vendorRepository) {
         this.categoryRepository = categoryRepository;
         this.customerRepository = customerRepository;
+        this.vendorRepository = vendorRepository;
     }
 
 
@@ -34,6 +38,18 @@ public class Bootstrap implements CommandLineRunner {
         loadCustomers();
         System.out.println("Number of Categories: " + categoryRepository.count());
 
+        System.out.println("Loading Vendors - Supposed to be 5 of them");
+        loadVendors();
+        System.out.println("Number of Vendors: " + vendorRepository.count());
+
+    }
+
+    private void loadVendors() {
+        vendorRepository.save(new Vendor("Western Tasty Fruits Ltd."));
+        vendorRepository.save(new Vendor("Exotic Fruits Company"));
+        vendorRepository.save(new Vendor("Home Fruits"));
+        vendorRepository.save(new Vendor("Fun Fresh Fruits Ltd."));
+        vendorRepository.save(new Vendor("Nuts for Nuts Company"));
     }
 
     private void loadCustomers() {
