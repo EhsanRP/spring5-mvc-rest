@@ -3,6 +3,7 @@ package guru.springframework.controllers.v1;
 import guru.springframework.api.v1.model.CustomerDTO;
 import guru.springframework.api.v1.model.CustomerListDTO;
 import guru.springframework.services.CustomerService;
+import guru.springframework.services.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@Controller
+@RestController
 @RequestMapping(CustomerController.BASE_URL)
 public class CustomerController {
 
@@ -22,54 +23,61 @@ public class CustomerController {
     }
 
     @GetMapping
-    public ResponseEntity<CustomerListDTO> getAllCustomers() {
-        return new ResponseEntity<CustomerListDTO>(new CustomerListDTO(customerService.getAllCustomers()), HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public CustomerListDTO getAllCustomers() {
+        return new CustomerListDTO(customerService.getAllCustomers());
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long id) {
-        return new ResponseEntity<CustomerDTO>(customerService.getCustomerById(id), HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public CustomerDTO getCustomerById(@PathVariable Long id) {
+        return customerService.getCustomerById(id);
     }
 
     @GetMapping("/firstName/{firstName}")
-    public ResponseEntity<CustomerDTO> getCustomerByFistName(@PathVariable String firstName) {
+    @ResponseStatus(HttpStatus.OK)
+    public CustomerDTO getCustomerByFistName(@PathVariable String firstName) {
         var key = searchKeyHelper(firstName);
 
         if (key == null)
-            return new ResponseEntity<CustomerDTO>(new CustomerDTO(), HttpStatus.NOT_FOUND);
+            throw  new ResourceNotFoundException();
 
-        return new ResponseEntity<CustomerDTO>(customerService.getCustomerByFirstName(key), HttpStatus.OK);
+        return customerService.getCustomerByFirstName(key);
     }
 
     @GetMapping("/lastName/{lastName}")
-    public ResponseEntity<CustomerDTO> getCustomerByLastName(@PathVariable String lastName) {
+    @ResponseStatus(HttpStatus.OK)
+    public CustomerDTO getCustomerByLastName(@PathVariable String lastName) {
         var key = searchKeyHelper(lastName);
 
         if (key == null)
-            return new ResponseEntity<CustomerDTO>(new CustomerDTO(), HttpStatus.NOT_FOUND);
+            throw  new ResourceNotFoundException();
 
-        return new ResponseEntity<CustomerDTO>(customerService.getCustomerByLastName(key), HttpStatus.OK);
+        return customerService.getCustomerByLastName(key);
     }
 
     @PostMapping
-    public ResponseEntity<CustomerDTO> createNewCustomer(@RequestBody CustomerDTO customerDTO) {
-        return new ResponseEntity<CustomerDTO>(customerService.createNewCustomer(customerDTO), HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public CustomerDTO createNewCustomer(@RequestBody CustomerDTO customerDTO) {
+        return customerService.createNewCustomer(customerDTO);
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDTO) {
-        return new ResponseEntity<CustomerDTO>(customerService.saveCustomerByDTO(id, customerDTO), HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public CustomerDTO updateCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDTO) {
+        return customerService.saveCustomerByDTO(id, customerDTO);
     }
 
     @PatchMapping("/id/{id}")
-    public ResponseEntity<CustomerDTO> patchCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDTO) {
-        return new ResponseEntity<CustomerDTO>(customerService.patchCustomer(id, customerDTO), HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public CustomerDTO patchCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDTO) {
+        return customerService.patchCustomer(id, customerDTO);
     }
 
     @DeleteMapping("/id/{id}")
-    public ResponseEntity<Void> deleteCustomerById(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteCustomerById(@PathVariable Long id) {
         customerService.deleteCustomerById(id);
-        return new ResponseEntity<Void>(HttpStatus.OK);
     }
 
     //HELPER METHODS
