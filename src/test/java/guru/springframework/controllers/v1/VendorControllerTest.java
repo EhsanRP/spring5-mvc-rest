@@ -51,9 +51,9 @@ public class VendorControllerTest {
         vendorDTO_2 = new VendorDTO("Vendor 2", VendorController.BASE_URL + "/2");
     }
 
-    @Ignore
-    @Test
-    public void getVendorList() throws Exception {
+//    @Ignore
+//    @Test
+//    public void getVendorList() throws Exception {
 //        var vendorListDTO = new VendorListDTO(new List<VendorDTO>() {
 //        })
 //        vendorListDTO.
@@ -64,14 +64,14 @@ public class VendorControllerTest {
 //                    .contentType(MediaType.APPLICATION_JSON))
 //                .andExpect(status().isOk())
 //                .andExpect(jsonPath("$.vendors", hasSize(2)));
-    }
+//    }
 
     @Test
     public void getVendorById() throws Exception {
 
         given(vendorService.findVendorById(anyLong())).willReturn(vendorDTO_1);
 
-        mockMvc.perform(get(VendorController.BASE_URL + "/1")
+        mockMvc.perform(get(VendorController.BASE_URL + "/id/1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", equalTo(vendorDTO_1.getName())));
@@ -94,7 +94,7 @@ public class VendorControllerTest {
 
         given(vendorService.updateVendor(anyLong(), any(VendorDTO.class))).willReturn(vendorDTO_1);
 
-        mockMvc.perform(put(VendorController.BASE_URL + "/1")
+        mockMvc.perform(put(VendorController.BASE_URL + "/id/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(vendorDTO_1)))
                 .andExpect(status().isOk())
@@ -105,7 +105,7 @@ public class VendorControllerTest {
     public void patchVendor() throws Exception {
         given(vendorService.patchVendor(anyLong(), any(VendorDTO.class))).willReturn(vendorDTO_1);
 
-        mockMvc.perform(patch(VendorController.BASE_URL + "/1")
+        mockMvc.perform(patch(VendorController.BASE_URL + "/id/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(vendorDTO_1)))
                 .andExpect(status().isOk())
@@ -114,7 +114,7 @@ public class VendorControllerTest {
 
     @Test
     public void deleteVendor() throws Exception {
-        mockMvc.perform(delete(VendorController.BASE_URL + "/1"))
+        mockMvc.perform(delete(VendorController.BASE_URL + "/id/1"))
                 .andExpect(status().isOk());
 
         then(vendorService).should().deleteVendor(anyLong());

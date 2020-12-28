@@ -67,6 +67,8 @@ public class VendorServiceImpl implements VendorService {
         var vendor = vendorMapper.vendorDTOtoVendor(vendorDTO);
         vendor.setId(id);
 
+        vendorRepository.save(vendor);
+
         return saveAndReturnDTO(vendor);
     }
 
@@ -76,6 +78,8 @@ public class VendorServiceImpl implements VendorService {
 
             if (vendorDTO.getName() != null)
                 vendor.setName(vendorDTO.getName());
+
+            vendorRepository.save(vendor);
 
             var returnDto = vendorMapper.vendorToVendorDTO(vendor);
             returnDto.setUrl(getVendorUrl(id));
@@ -108,7 +112,7 @@ public class VendorServiceImpl implements VendorService {
     }
 
     private String getVendorUrl(Long id) {
-        return VendorController.BASE_URL + "/" + id;
+        return VendorController.BASE_URL + "/id/" + id;
     }
 
 }
